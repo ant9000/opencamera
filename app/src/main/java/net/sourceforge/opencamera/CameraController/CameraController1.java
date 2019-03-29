@@ -7,6 +7,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.TreeSet;
+import java.lang.reflect.Method;
 
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
@@ -49,6 +54,9 @@ public class CameraController1 extends CameraController {
 	private int picture_width;
 	private int picture_height;
 
+	//HAL1 version code
+	private static final int CAMERA_HAL_API_VERSION_1_0 = 0x100;
+
 	/** Opens the camera device.
 	 * @param cameraId Which camera to open (must be between 0 and CameraControllerManager1.getNumberOfCameras()-1).
 	 * @param camera_error_cb onError() will be called if the camera closes due to serious error. No more calls to the CameraController1 object should be made (though a new one can be created, to try reopening the camera).
@@ -60,7 +68,14 @@ public class CameraController1 extends CameraController {
 			Log.d(TAG, "create new CameraController1: " + cameraId);
 		this.camera_error_cb = camera_error_cb;
 		try {
-			camera = Camera.open(cameraId);
+			try {
+				Method openMethod = Class.forName("android.hardware.Camera").getMethod("openLegacy", int.class, int.class);
+				camera = (Camera) openMethod.invoke(null, cameraId, CAMERA_HAL_API_VERSION_1_0);
+			}
+			catch(Exception e){
+				camera = Camera.open(cameraId);
+			}
+			dumpParameters(camera.getParameters());
 		}
 		catch(RuntimeException e) {
 			if( MyDebug.LOG )
@@ -171,6 +186,27 @@ public class CameraController1 extends CameraController {
     		e.printStackTrace();
     		count_camera_parameters_exception++;
 	    }
+	}
+
+	public static void dumpParameters(Camera.Parameters params) {
+		Set<String> sortedParams = new TreeSet<String>();
+		sortedParams.addAll(Arrays.asList(params.flatten().split(";")));
+		StringBuilder sb = new StringBuilder();
+		sb.append("[");
+		Iterator<String> i = sortedParams.iterator();
+		while (i.hasNext()) {
+			String nextParam = i.next();
+			if ((sb.length() + nextParam.length()) > 2044) {
+				Log.d(TAG, "Parameters: " + sb.toString());
+				sb = new StringBuilder();
+			}
+			sb.append(nextParam);
+			if (i.hasNext()) {
+				sb.append(", ");
+			}
+		}
+		sb.append("]");
+		Log.d(TAG, "Parameters: " + sb.toString());
 	}
 	
 	private List<String> convertFlashModesToValues(List<String> supported_flash_modes) {
