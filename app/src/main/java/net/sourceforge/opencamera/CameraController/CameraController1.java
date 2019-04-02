@@ -62,17 +62,24 @@ public class CameraController1 extends CameraController {
 	 * @param camera_error_cb onError() will be called if the camera closes due to serious error. No more calls to the CameraController1 object should be made (though a new one can be created, to try reopening the camera).
 	 * @throws CameraControllerException if the camera device fails to open.
      */
-	public CameraController1(int cameraId, final ErrorCallback camera_error_cb) throws CameraControllerException {
+	public CameraController1(int cameraId, final ErrorCallback camera_error_cb, boolean use_open_legacy) throws CameraControllerException {
 		super(cameraId);
 		if( MyDebug.LOG )
 			Log.d(TAG, "create new CameraController1: " + cameraId);
 		this.camera_error_cb = camera_error_cb;
 		try {
-			try {
-				Method openMethod = Class.forName("android.hardware.Camera").getMethod("openLegacy", int.class, int.class);
-				camera = (Camera) openMethod.invoke(null, cameraId, CAMERA_HAL_API_VERSION_1_0);
+			if( use_open_legacy ) {
+				if( MyDebug.LOG )
+					Log.d(TAG, "opening camera in legacy mode");
+				try {
+					Method openMethod = Class.forName("android.hardware.Camera").getMethod("openLegacy", int.class, int.class);
+					camera = (Camera) openMethod.invoke(null, cameraId, CAMERA_HAL_API_VERSION_1_0);
+				}
+				catch(Exception e) {
+					camera = Camera.open(cameraId);
+				}
 			}
-			catch(Exception e){
+			else {
 				camera = Camera.open(cameraId);
 			}
 			dumpParameters(camera.getParameters());

@@ -34,6 +34,7 @@ public interface ApplicationInterface {
 	
 	// methods that request information
 	Context getContext(); // get the application context
+	boolean useCamera1Legacy(); // should we use openLegacy with Camera 1 API?
 	boolean useCamera2(); // should Android 5's Camera 2 API be used?
 	Location getLocation(); // get current location - null if not available (or you don't care about geotagging)
 	int createOutputVideoMethod(); // return a VIDEOMETHOD_* value to specify how to create a video file

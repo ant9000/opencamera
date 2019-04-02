@@ -16,6 +16,7 @@ import net.sourceforge.opencamera.Preview.ApplicationInterface.NoFreeStorageExce
 import net.sourceforge.opencamera.Preview.CameraSurface.CameraSurface;
 import net.sourceforge.opencamera.Preview.CameraSurface.MySurfaceView;
 import net.sourceforge.opencamera.Preview.CameraSurface.MyTextureView;
+import net.sourceforge.opencamera.PreferenceKeys;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -1512,7 +1513,7 @@ public class Preview implements SurfaceHolder.Callback, TextureView.SurfaceTextu
 	    		}
 	        }
 	        else
-				camera_controller_local = new CameraController1(cameraId, cameraErrorCallback);
+				camera_controller_local = new CameraController1(cameraId, cameraErrorCallback, applicationInterface.useCamera1Legacy());
 			//throw new CameraControllerException(); // uncomment to test camera not opening
 		}
 		catch(CameraControllerException e) {

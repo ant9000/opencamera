@@ -212,6 +212,11 @@ public class MyApplicationInterface extends BasicApplicationInterface {
     }
     
     @Override
+	public boolean useCamera1Legacy() {
+		return sharedPreferences.getBoolean(PreferenceKeys.UseCamera1LegacyPreferenceKey, false);
+	}
+
+    @Override
 	public boolean useCamera2() {
         if( main_activity.supportsCamera2() ) {
     		return sharedPreferences.getBoolean(PreferenceKeys.UseCamera2PreferenceKey, false);

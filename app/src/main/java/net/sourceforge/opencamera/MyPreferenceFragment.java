@@ -627,6 +627,27 @@ public class MyPreferenceFragment extends PreferenceFragment implements OnShared
 			}
 		}
 
+		{
+			final Preference pref = findPreference("preference_use_camera1_legacy");
+			pref.setOnPreferenceClickListener(new OnPreferenceClickListener() {
+				@Override
+				public boolean onPreferenceClick(Preference arg0) {
+					if( pref.getKey().equals("preference_use_camera1_legacy") ) {
+						if( MyDebug.LOG )
+							Log.d(TAG, "user clicked camera1 legacy API");
+						if( ! sharedPreferences.getBoolean(PreferenceKeys.UseCamera2PreferenceKey, false) ) {
+							if( MyDebug.LOG )
+								Log.d(TAG, "need to restart");
+							MainActivity main_activity = (MainActivity)MyPreferenceFragment.this.getActivity();
+							main_activity.restartOpenCamera();
+							return false;
+						}
+					}
+					return false;
+				}
+			});
+		}
+
 		final boolean supports_camera2 = bundle.getBoolean("supports_camera2");
 		if( MyDebug.LOG )
 			Log.d(TAG, "supports_camera2: " + supports_camera2);
